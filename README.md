@@ -46,7 +46,7 @@ Both dashboards provide Variables that can be used to filter in/out the data usi
 ```shell
 terraform apply \
   -var="deploy-to-region=us-east-1" \
-  -var="grafana_ec2_subnet=subnet-054c09f80cdb1f4d5" \
+  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET>" \
   -var="solution_prefix=cmcd"
 ```
 
@@ -91,7 +91,7 @@ By re-running the command, Terraform will attempt to deploy the instances again,
 ```shell
 terraform destroy \
   -var="deploy-to-region=us-east-1" \
-  -var="grafana_ec2_subnet=subnet-054c09f80cdb1f4d5" \
+  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET>" \
   -var="solution_prefix=cmcd"
 ```
 
