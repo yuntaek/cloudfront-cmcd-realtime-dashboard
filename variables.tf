@@ -3,11 +3,7 @@ variable "solution_prefix" {
   type     = string
   nullable = false
 }
-variable "grafana_sso_organizational_units" {
-  type     = string
-  nullable = false
-}
-variable "grafana_sso_admin_user_id" {
+variable "grafana_ec2_subnet" {
   type     = string
   nullable = false
 }

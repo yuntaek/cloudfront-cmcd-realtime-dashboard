@@ -28,35 +28,30 @@ Both dashboards provide Variables that can be used to filter in/out the data usi
 
 ## Prerequisites 
 - Terrafrom 1.1.9+
-- A user in [AWS Identity and Access Management](https://aws.amazon.com/iam/identity-center/) and the [organizational unit](https://aws.amazon.com/organizations/) to be used for administrating Grafana dashboard 
+- VPC has more than one public subnet 
 - AWS CLI
 
 ## Solution deployment
-1. Choose AWS profile to be used to deploy solution, for example:
 
-`export AWS_PROFILE=CMCD-demo`
-
-2. Zip Lambda function
+1. Zip Lambda function
 
 `cd lambda && zip -r cmcd-log-processor.zip cmcd-log-processor.py && cd ..`
 
-3. Init Terraform
+2. Init Terraform
 
 `terraform init`
 
-4. Deploy the solution:
+3. Deploy the solution:
 
 ```shell
 terraform apply \
-  -var="deploy-to-region=<AWS_REGION>" \
-  -var="grafana_sso_organizational_units=<AWS_ORG_UNIT_ID>" \
-  -var="grafana_sso_admin_user_id=<ADMIN_USER_ID>" \
-  -var="solution_prefix=<SOLUTION_PREFIX>"
+  -var="deploy-to-region=us-east-1" \
+  -var="grafana_ec2_subnet=subnet-054c09f80cdb1f4d5" \
+  -var="solution_prefix=cmcd"
 ```
 
 - `deploy-to-region`:  Specifies the AWS region where the solution will be deployed. Ensure that this region supports both Amazon Timestream and Grafana services.
-- `grafana_sso_organizational_units`: Specifies the AWS Organizational Unit ID to be used for Grafana Single Sign-On (SSO) authentication.
-- `grafana_sso_admin_user_id`: Specifies the user ID to be designated as the Grafana administrator.
+- `grafana_ec2_subnet`: Specifies the subnet where grafana will be installed.
 - `solution_prefix`:  Provides a unique prefix that will be appended to resource names created by the solution.
 
 **Note:** If you encounter the error message:
@@ -69,24 +64,17 @@ By re-running the command, Terraform will attempt to deploy the instances again,
 
 ## Install the dashboard
 ### Install the Amazon Timestream plugin in Amazon Grafana 9.4:
-* Open Grafana using the provided Grafana workspace URL.
-* Navigate to "Apps" -> "AWS Data Source". 
-* Select "Install now" for Timestream.
+* Open Grafana using the provided Grafana dashboard URL.
+* Navigate to "Connections" -> "Add new connetion"
+* select "Amazon Timestream". 
+* Select "Installn" for Timestream.
 * Click "Install".
 
 ### Configure Amazon Timestream datasource:
-* Navigate to "Administration" -> "Data Sources".  
+* Navigate to "connection" -> "Data Sources".  
 * Click "Add data source".
 * Select "Amazon Timestream".
-
-**Note:** If you encounter the error message:
-```
-Fetch error: 404 Not Found Instantiating ...
-```
-This indicates that the plugin installation has not yet been propagated across all Amazon Grafana servers. 
-In such cases, it's advisable to wait several more minutes before proceeding to the next step.
-
-* Choose the region used for provisioning as the "Default Region".
+* Choose the us-east-1 as the "Default Region".
 * Select "cmcd-db" as the "Database".
 * Select "cmcd-table" as "Table".
 * Select "MULTI" as "Measure". 
@@ -102,10 +90,9 @@ In such cases, it's advisable to wait several more minutes before proceeding to 
 ## De-provisioning
 ```shell
 terraform destroy \
-  -var="deploy-to-region=<AWS_REGION>" \
-  -var="grafana_sso_organizational_units=<AWS_ORG_UNIT_ID>" \
-  -var="grafana_sso_admin_user_id=<ADMIN_USER_ID>" \
-  -var="solution_prefix=<SOLUTION_PREFIX>"
+  -var="deploy-to-region=us-east-1" \
+  -var="grafana_ec2_subnet=subnet-054c09f80cdb1f4d5" \
+  -var="solution_prefix=cmcd"
 ```
 
 ## Dashboard walk-through.

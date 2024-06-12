@@ -488,7 +488,7 @@ resource "aws_iam_role" "cf_logs_grafana_role" {
         Effect = "Allow"
         Sid    = ""
         Principal = {
-          Service = "grafana.amazonaws.com"
+          Service = "ec2.amazonaws.com"
         }
       },
     ]
@@ -500,21 +500,45 @@ resource "aws_iam_role_policy_attachment" "cf_logs_grafana_policy_attachment" {
   policy_arn = aws_iam_policy.cf_logs_grafana_timestream_policy.arn
 }
 
-resource "aws_grafana_workspace" "cf_grafana" {
-  name                     = var.solution_prefix
-  account_access_type      = "ORGANIZATION"
-  organizational_units     = [var.grafana_sso_organizational_units]
-  authentication_providers = ["AWS_SSO"]
-  permission_type          = "SERVICE_MANAGED"
-  role_arn                 = aws_iam_role.cf_logs_grafana_role.arn
-  data_sources             = ["TIMESTREAM"]
-  configuration            = jsonencode({"plugins": {"pluginAdminEnabled": true}, "unifiedAlerting": {"enabled": false}})
+resource "aws_security_group" "grafana" {
+  ingress {
+    from_port = 3000
+    to_port = 3000
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  ingress {
+    from_port = 22
+    to_port = 22
+    protocol = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port = 0
+    to_port = 0
+    protocol = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
-resource "aws_grafana_role_association" "cf_grafana_admins" {
-  role         = "ADMIN"
-  user_ids     = [var.grafana_sso_admin_user_id]
-  workspace_id = aws_grafana_workspace.cf_grafana.id
+resource "aws_iam_instance_profile" "grafana_profile" {
+  name = "grafana_profile"
+  role = "${aws_iam_role.cf_logs_grafana_role.name}"
+}
+#Deploy grafana
+resource "aws_instance" "garafana-ec2" {
+  ami = "ami-08a0d1e16fc3f61ea"
+  iam_instance_profile = "${aws_iam_instance_profile.grafana_profile.name}"
+  instance_type = "c5.xlarge"
+  subnet_id = var.grafana_ec2_subnet
+  security_groups = [aws_security_group.grafana.id]
+  user_data= <<EOT
+#!/bin/bash
+sleep 4
+sudo yum install -y docker
+sudo systemctl start docker
+sudo docker run -d --name=grafana -p 3000:3000 grafana/grafana
+  EOT
 }
 
 # Deploy clients
@@ -616,5 +640,8 @@ output "distribution_domain_name" {
   value = aws_cloudfront_distribution.distribution.domain_name
 }
 output "grafana_dashboard" {
-  value = aws_grafana_workspace.cf_grafana.endpoint
+  value = "http://${aws_instance.garafana-ec2.public_ip}:3000"
+}
+output "user_id_password" {
+  value = "admin/admin"
 }
