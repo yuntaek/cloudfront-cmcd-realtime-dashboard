@@ -91,7 +91,7 @@ terraform destroy \
   -var="deploy-to-region=us-east-1" \
   -var="grafana_ec2_subnet=<AWS_VPC_SUBNET>" \
   -var="solution_prefix=cmcd"
-```</text>
+```
 
 ## Dashboard walk-through.
 ## 대시보드 둘러보기
