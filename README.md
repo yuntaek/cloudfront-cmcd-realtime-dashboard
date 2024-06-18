@@ -30,27 +30,30 @@
 - AWS CLI
 
 ## 솔루션 배포
+1. git clone
 
-1. Lambda 함수 압축
+`git clone https://github.com/yuntaek/cloudfront-cmcd-realtime-dashboard.git`
+
+2. Lambda 함수 압축
 
 `cd lambda && zip -r cmcd-log-processor.zip cmcd-log-processor.py && cd ..`
 
-2. Terraform 초기화
+3. Terraform 초기화
 
 `terraform init`
 
-3. 솔루션 배포:
+4. 솔루션 배포:
 
 ```shell
 terraform apply \
   -var="deploy-to-region=us-east-1" \
-  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET>" \
+  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET_ID>" \
   -var="solution_prefix=cmcd"
 ```
 
-- `deploy-to-region`: 솔루션이 배포될 AWS 리전을 지정합니다. 이 리전에서 Amazon Timestream 서비스를 지원해야 합니다.
-- `grafana_ec2_subnet`: Grafana가 설치될 서브넷을 지정합니다.
-- `solution_prefix`: 솔루션에 의해 생성된 리소스 이름에 붙일 고유한 접두사를 제공합니다.
+- `deploy-to-region`: 솔루션이 배포될 AWS 리전을 지정합니다. 이 리전에서 Amazon Timestream 서비스를 지원해야 합니다. `예) us-east-1`
+- `grafana_ec2_subnet_id`: Grafana가 설치될 서브넷 Id를 입력하여 지정합니다.  `예) subnet-054cccfcccdb55555`
+- `solution_prefix`: 솔루션에 의해 생성된 리소스 이름에 붙일 고유한 접두사를 제공합니다. `예) CMCD0618`
 
 **참고:** 다음과 같은 오류 메시지가 표시되면:
 ```
@@ -60,8 +63,14 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 이 오류는 일반적으로 Lightsail 인스턴스 플랜 크기가 계정 설정과 호환되지 않을 때 발생합니다.
 명령을 다시 실행하면 Terraform에서 인스턴스 배포를 다시 시도하므로 후속 시도에서 성공할 수 있습니다.
 
+5. Grafana 대시보드 접속 정보 :
+솔루션 배포가 끝나면 아래와 같이 Grafana 접속 정보가 output 정보가 전달됩니다.
+`grafana_dashboard = "http://44.198.178.32:3000"`
+계정도 함께 전달됩니다.
+`user_id_password = "admin/admin"`
+
 ## 대시보드 설치
-### Amazon Grafana 9.4에 Amazon Timestream 플러그인 설치:
+### Grafana 에 Amazon Timestream 플러그인 설치:
 * 제공된 Grafana 대시보드 URL을 통해 Grafana에 접속합니다.
 * "Connections" -> "Add new connetion"으로 이동합니다.
 * "Amazon Timestream"을 선택합니다.
@@ -78,12 +87,19 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 * "Measure"에 "MULTI"를 선택합니다.
 * "Save and test"를 클릭합니다.
 
+
+
+### CMCD 대시보드 JSON file 다운로드
+* 웹브라우저에서 [dashboards](./dashboards)에서 QoE.json, Troubleshooting.json 을 ~/Downloads(또는 임의) 에 저장합니다.
+
 ### CMCD 대시보드 업로드:
 
 * "Dashboards"로 이동합니다.
 * "New" -> "Import"를 선택합니다.
 * "Upload dashboard JSON file"을 선택합니다.
-* [dashboards](./dashboards)에서 대시보드를 선택합니다.
+* "~/Downloads(또은 임의)" 폴더에서 대시보드 파일 QoE.json을 선택합니다.
+* 위와 동일한 방법으로 Troubleshooting.json을 대시보드에 업로드합니다.
+
 
 ## 프로비저닝 해제
 ```shell
@@ -92,14 +108,11 @@ terraform destroy \
   -var="grafana_ec2_subnet=<AWS_VPC_SUBNET>" \
   -var="solution_prefix=cmcd"
 ```
-
-## Dashboard walk-through.
 ## 대시보드 둘러보기
 기본적으로 대시보드는 자동 새로고침되지 않습니다. 필요 없을 때는 Timestream에 대한 쿼리 수를 최소화하여 비용을 절감할 수 있습니다.
 대시보드는 오른쪽 상단 메뉴에서 **Refresh Dashboard**를 클릭하거나 같은 메뉴에서 자동 새로고침을 설정하여 새로고칠 수 있습니다.
 같은 메뉴에서 Time picker를 *Last 30 minutes*에서 다른 시간 간격으로 변경할 수 있습니다..
 
-### QoE dashboard
 ### QoE 대시보드
 1. 이 대시보드는 QoE 및 트래픽 메트릭을 보여주기 위한 것입니다. **Quality of experience**와 **Traffic figures** 두 개의 섹션(행)이 있으며, 다른 데이터에 집중할 수 있도록 최소화할 수 있습니다.
 2. **Concurrent Plays**는 Time picker에 지정된 시간 동안 고유한 비디오 세션 ID(CMCD *sid* 매개변수) 수를 계산하여 추정합니다. 이는 고유 시청자 수와 동일하지 않습니다. 5분 길이의 비디오가 지속적으로 재생되므로 동일한 클라이언트가 해당 기간 내에 여러 번 재생을 완료하고 시작할 수 있기 때문입니다.
