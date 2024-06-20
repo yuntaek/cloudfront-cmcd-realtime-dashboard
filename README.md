@@ -46,7 +46,7 @@
 
 ```shell
 terraform apply \
-  -var="deploy-to-region=us-east-1" \
+  -var="deploy-to-region=<AWS_REGION_CODE>" \
   -var="grafana_ec2_subnet=<AWS_VPC_SUBNET_ID>" \
   -var="solution_prefix=cmcd"
 ```
@@ -104,8 +104,8 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 ## 프로비저닝 해제
 ```shell
 terraform destroy \
-  -var="deploy-to-region=us-east-1" \
-  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET>" \
+  -var="deploy-to-region=<AWS_REGION_CODE>" \
+  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET_ID>" \
   -var="solution_prefix=cmcd"
 ```
 ## 대시보드 둘러보기
@@ -122,9 +122,9 @@ terraform destroy \
 6. **Buffer Length**와 **Measured Throughput**는 **Percentiles aggregation** 변수에 의해 제어되는 백분위수 집계를 사용합니다.
 7. **Total Throughput**과 **Total Measured Throughput** 모두 총 처리량을 제공하지만 방식은 다릅니다.
 **Total Throughput**은 CloudFront *sc_bytes*를 사용하여 계산되며, 시청자에게 전송된 총 바이트를 기간으로 나눈 값입니다.
-이 방식으로 트래픽 피크가 시간에 따라 평활화됩니다.
+이 방식으로 트래픽 피크가 시간에 따라 변화가 완만하게 보입니다.
 **Measured Throughput**은 CMCD 매개변수 *mtp*에서 계산되며, 이는 미디어 플레이어에서 측정한 처리량입니다.
-이 경우 트래픽 피크는 평활화되지 않습니다.
+이 경우 트래픽 피크는 급격한 변화를 보이게 됩니다.
 8. **Plays by GEO** 지도는 국가별 동시 세션 수를 보여줍니다. **Plays by PoP**은 CloudFront PoP에서 종료되는 동시 세션 수를 보여줍니다.
 
 
@@ -132,7 +132,7 @@ terraform destroy \
 1. 이 대시보드는 재버퍼링 이벤트의 근본 원인을 찾는 데 도움이 됩니다.
 **Rebuffering Events Count**와 **Rebuffering Events Percentage**는 시간에 따른 재버퍼링 변화를 보여줍니다.
 
-2. 근본 원인 조사를 돕기 위해 **Rebuffering Events Logs**에서는 영향을 받은 요청의 로그 발췌문을 보여줍니다. 버퍼 스타베이션 신호는 실제 버퍼 스타베이션 이후의 요청에 전달되므로 *Lag* 함수를 사용하여 *bs* 신호 이전의 로그 레코드에서 데이터를 추출합니다.
+2. 근본 원인 조사를 돕기 위해 **Rebuffering Events Logs**에서는 영향을 받은 요청의 로그 발췌문을 보여줍니다. 버퍼 스타베이션(Buffer Starvation) 신호는 실제 버퍼 스타베이션 이후의 요청에 전달되므로 *Lag* 함수를 사용하여 *bs* 신호 이전의 로그 레코드에서 데이터를 추출합니다.
 이를 통해 더 정확한 문제 추적이 가능해집니다. 로그에서 검색된 데이터에는 성능 관련 티켓에 대해 CloudFront 지원에 필요한 CloudFront 요청 ID가 포함됩니다.
 
 3. 재버퍼링이 CDN 또는 오리진에 의한 것인지 이해하기 위해 CloudFront에서 측정한 첫 바이트 대기 시간 값을 사용합니다.
@@ -145,7 +145,7 @@ terraform destroy \
 예를 들어, 두 메트릭에 동시에 스파이크가 발생하면 상관관계를 나타낼 수 있습니다. 재버퍼링 비율은 QoE 대시보드와 다르게 측정됩니다. 선택된 간격 내 전체 요청 수 중 재버퍼링 요청이 1% 이상인 비디오 세션의 비율을 정량화합니다. 예를 들어, 비디오 청크 기간이 4초, 버퍼 길이가 30초라면 플레이어는 5분 동안 약 82개의 요청을 보냅니다. 따라서 재버퍼링을 나타내는 요청이 2개만 있어도 전체 요청의 1% 이상이 되어 해당 세션이 스톨/재버퍼링으로 계산됩니다. 재버퍼링 비디오 재생 비율이 특정 임계값을 초과하면 알림을 설정하고 근본 원인 분석이 필요할 때 재버퍼링 비율을 사용할 수 있습니다.  
 
 5. 때로는 TTFB가 크게 변동되더라도 허용 가능한 값 범위 내에 있을 수 있습니다. 예를 들어 TTFB가 10ms에서 20ms로 스파이크를 보이면 100% 증가한 것이지만, 20ms는 첫 바이트 전송을 시작하기 전까지의 허용 가능한 지연 시간입니다. 따라서 TTFB 라인의 변동성뿐만 아니라 실제 값에도 주의를 기울여야 합니다. 이를 돕기 위해
-*Changeability of TTFB: HIT**와 **Changeability of Origin FBL**에서는 추세와 변화율을 측정하는 이동 평균을 제공합니다. 이를 통해 일시적인 스파이크에 현혹되지 않고 문제를 나타내는 전반적인 상향 추세를 파악할 수 있습니다.
+**Changeability of TTFB: HIT**와 **Changeability of Origin FBL**에서는 추세와 변화율을 측정하는 이동 평균을 제공합니다. 이를 통해 일시적인 스파이크에 현혹되지 않고 문제를 나타내는 전반적인 상향 추세를 파악할 수 있습니다.
 
 # CMCD란 무엇인가?
 CMCD는 Consumer Technology Association(CTA)가 주최하는 WAVE(Web Application Video Ecosystem) 프로젝트에서 개발한 사양입니다. 미디어 플레이어가 사용자 지정 HTTP 요청 헤더, HTTP 쿼리 인수 또는 JSON 객체를 통해 각 요청과 함께 클라이언트 측 QoE 메트릭을 전송할 수 있는 방법을 명시합니다. 전체 메트릭 목록이 포함된 CMCD 사양은 [여기](https://cdn.cta.tech/cta/media/media/resources/standards/pdfs/cta-5004-final.pdf)에서 확인할 수 있습니다.
