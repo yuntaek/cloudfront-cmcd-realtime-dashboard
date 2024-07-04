@@ -29,6 +29,41 @@
 - VPC에 하나 이상의 퍼블릭 서브넷이 있어야 함
 - AWS CLI
 
+## AWS Cloud9 통합 개발 환경 설정
+
+1. AWS cloud9 생성
+   1. **AWS Cloud9** 콘솔 로 이동합니다.
+   2. **"환경 생성"** 버튼을 클릭합니다.
+   3. 세부 정보 이름에 `cmcd test`(또는 자유 입력)를 입력하고, 나머지 정보는 기본값으로 둔 후 "생성" 버튼을 클릭합니다.
+2. cloud9 IDE 열기
+3. Cloud9에서 사용하는 Credential에 admin권한 추가
+  AWS Cloud9의 경우, IAM credentials를 동적으로 관리합니다. 해당 credentials는 워크샵을 배포하기 위한 모든 권한을 갖고 있지 않기에 이를 비활성화하고 Admin role 을 포함한 다른 Role 을 사용합니다.
+   1. 우측 상단에 기어 아이콘을 클릭한 후, 사이드 바에서 **AWS Settings** 릭합니다.
+   2. **Credentials** 항목에서 **AWS managed temporary credentials** 설정을 비활성화합니다.
+   3. **Temporary credentials**이 없는지 확실히 하기 위해 기존의 자격 증명 파일도 제거합니다.  
+    ```bash
+    rm -vf ${HOME}/.aws/credentials
+    ```
+   4. **GetCallerIdentity CLI** 명령어를 통해, Cloud9 IDE가 올바른 IAM Role을 사용하고 있는지 확인하세요. **결과 값이 나오면** 올바르게 설정된 것입니다.  
+    ```bash
+    WSParticipantRole:~/environment $ aws sts get-caller-identity --query Arn | grep AWSCloud9SSMAccessRole
+    "arn:aws:sts::379694885721:assumed-role/AWSCloud9SSMAccessRole/i-03b09f03ddfb5e008"
+    ```
+   5. **IAM 콘솔**로 이동하여 왼쪽 메뉴 **역할**을 선택합니다.
+   6. 확인된 역할(ex. `AWSCloud9SSMAccessRole`)을 선택한 후, 권한 정책에 **정책 연결** 버튼을 클릭하여 `AdministratorAccess`를 추가합니다.
+4. 테라폼 설치테라폼 설치 (https://developer.hashicorp.com/terraform/install#linux)
+  ```bash
+    sudo yum install -y yum-utils shadow-utils
+    sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+    sudo yum -y install terraform​
+  ```
+5. 테라폼 설치 확인
+  ```bash
+terraform --version
+  ```
+
+
+
 ## 솔루션 배포
 1. git clone
 
