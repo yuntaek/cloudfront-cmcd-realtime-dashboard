@@ -136,9 +136,10 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 * "Save and test"를 클릭합니다.
 
 
-
 ### CMCD 대시보드 JSON file 다운로드
-* 웹브라우저에서 [dashboards](./dashboards)에서 QoE.json, Troubleshooting.json 을 ~/Downloads(또는 임의) 에 저장합니다.
+* 웹브라우저에서 옆에 링크들을 눌러 Github 페이지에서  [**QoE.json**](https://github.com/yuntaek/cloudfront-cmcd-realtime-dashboard/blob/main/dashboards/QoE.json), [**Troubleshooting.json**](https://github.com/yuntaek/cloudfront-cmcd-realtime-dashboard/blob/main/dashboards/Troubleshooting.json) 을 ~/Downloads(또는 임의) 에 저장합니다.
+저장하는 방법은 아래 그림처럼 다운로드 아이콘을 눌러주시면 됩니다.
+![download](/img/download.png)
 
 ### CMCD 대시보드 업로드:
 
@@ -146,7 +147,15 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 * "New" -> "Import"를 선택합니다.
 * "Upload dashboard JSON file"을 선택합니다.
 * "~/Downloads(또은 임의)" 폴더에서 대시보드 파일 QoE.json을 선택합니다.
+* Amazon Timestream 의 데이터 소스로 default로 지정된 grafana-tiemstream-datasource를 선택합니다.
+* Import 버튼을 눌러 줍니다.
 * 위와 동일한 방법으로 Troubleshooting.json을 대시보드에 업로드합니다.
+
+### CMCD 대시보드 확인:
+
+* "Dashboards"로 이동합니다.
+* 아보시기 원하는 대시보드를 선택합니다. 
+![dashboards](/img/dashboard.png)
 
 
 ## 프로비저닝 해제
