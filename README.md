@@ -83,12 +83,19 @@ cd lambda && zip -r cmcd-log-processor.zip cmcd-log-processor.py && cd ..
 terraform init
 ```
 
-4. 솔루션 배포:
+4. 설치할 Region 및 SubnetID 획득
+```
+subnet_arn=$(aws ec2 describe-subnets --output json | jq -r '.Subnets[0].SubnetArn')
+AWS_REGION_CODE=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $4}')
+AWS_VPC_SUBNET_ID=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $7}')
+```
+
+5. 솔루션 배포:
 
 ```shell
 terraform apply \
-  -var="deploy-to-region=<AWS_REGION_CODE>" \
-  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET_ID>" \
+  -var="deploy-to-region=$AWS_REGION_CODE" \
+  -var="grafana_ec2_subnet=$AWS_VPC_SUBNET_ID" \
   -var="solution_prefix=cmcd"
 ```
 
@@ -104,7 +111,7 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 이 오류는 일반적으로 Lightsail 인스턴스 플랜 크기가 계정 설정과 호환되지 않을 때 발생합니다.
 명령을 다시 실행하면 Terraform에서 인스턴스 배포를 다시 시도하므로 후속 시도에서 성공할 수 있습니다.
 
-5. Grafana 대시보드 접속 정보 :
+6. Grafana 대시보드 접속 정보 :
 솔루션 배포가 끝나면 아래와 같이 Grafana 접속 정보가 output 정보가 전달됩니다.
 `grafana_dashboard = "http://xxx.xxx.xxx.xxx:3000"`
 계정도 함께 전달됩니다.
