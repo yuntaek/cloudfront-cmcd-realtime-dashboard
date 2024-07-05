@@ -53,8 +53,8 @@
    6. 확인된 역할(ex. `AWSCloud9SSMAccessRole`)을 선택한 후, 권한 정책에 **정책 연결** 버튼을 클릭하여 `AdministratorAccess`를 추가합니다.
 4. 테라폼 설치테라폼 설치 (https://developer.hashicorp.com/terraform/install#linux)
   ```bash
-  sudo yum install -y yum-utils shadow-utils
-  sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+  sudo yum install -y yum-utils shadow-utils &&\
+  sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo &&\
   sudo yum -y install terraform
   ```
 5. 테라폼 설치 확인
