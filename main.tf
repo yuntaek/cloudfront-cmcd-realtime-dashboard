@@ -565,23 +565,49 @@ resource "aws_lightsail_instance" "mobile-client-dub" {
                               tput = var.mobile-tput})
 
 }
-resource "aws_lightsail_instance" "desktop-client-fra" {
+
+resource "aws_lightsail_instance" "smarttv-client-dub" {
+  provider = aws.eu-west-1
+  name = "smarttv-client-dub"
+  blueprint_id      = "ubuntu_20_04"
+  bundle_id         = "medium_2_0"
+  availability_zone = "eu-west-1a"
+  user_data = templatefile("script.tftpl",
+                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
+                              ua = var.smarttv-user-agent,
+                              tput = ""})
+
+}
+
+resource "aws_lightsail_instance" "throttled-client-cdg" {
   provider = aws.eu-central-1
-  name = "desktop-client-fra"
+  name = "throttled-client-cdg"
   blueprint_id      = "ubuntu_20_04"
   bundle_id         = "medium_2_0"
   availability_zone = "eu-central-1a"
   user_data = templatefile("script.tftpl",
                             { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = "",
-                              tput = ""})
+                              ua = var.smarttv-user-agent,
+                              tput= 60 })
+
 }
-resource "aws_lightsail_instance" "mobile-client-fra" {
-  provider = aws.eu-central-1
-  name = "mobile-client-fra"
+resource "aws_lightsail_instance" "smarttv-client-iad" {
+  provider = aws.us-east-1
+  name = "smarttv-client-iad"
   blueprint_id      = "ubuntu_20_04"
   bundle_id         = "medium_2_0"
-  availability_zone = "eu-central-1a"
+  availability_zone = "us-east-1a"
+  user_data = templatefile("script.tftpl",
+                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
+                              ua = var.smarttv-user-agent,
+                              tput = ""})
+}
+resource "aws_lightsail_instance" "mobile-client-iad" {
+  provider = aws.us-east-1
+  name = "mobile-client-iad"
+  blueprint_id      = "ubuntu_20_04"
+  bundle_id         = "medium_2_0"
+  availability_zone = "us-east-1a"
   user_data = templatefile("script.tftpl",
                             { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
                               ua = var.mobile-user-agent,
@@ -598,43 +624,9 @@ resource "aws_lightsail_instance" "desktop-client-iad" {
                             { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
                               ua = "",
                               tput = ""})
-}
-resource "aws_lightsail_instance" "mobile-client-iad" {
-  provider = aws.us-east-1
-  name = "mobile-client-iad"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "us-east-1a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = var.mobile-user-agent,
-                              tput = var.mobile-tput})
 
 }
-resource "aws_lightsail_instance" "smarttv-client-lhr" {
-  provider = aws.eu-west-2
-  name = "desktop-client-lhr"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "eu-west-2a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = var.smarttv-user-agent,
-                              tput = ""})
 
-}
-resource "aws_lightsail_instance" "throttled-client-cdg" {
-  provider = aws.eu-west-3
-  name = "throttled-client-cdg"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "eu-west-3a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = "",
-                              tput= 60 })
-
-}
 
 output "distribution_domain_name" {
   value = aws_cloudfront_distribution.distribution.domain_name
