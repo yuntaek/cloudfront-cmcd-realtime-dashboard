@@ -11,18 +11,6 @@ provider "aws" {
   alias   = "us-east-1"
   region  = "us-east-1"
 }
-provider "aws" {
-  alias   = "eu-central-1"
-  region  = "eu-central-1"
-}
-provider "aws" {
-  alias   = "eu-west-2"
-  region  = "eu-west-2"
-}
-provider "aws" {
-  alias   = "eu-west-3"
-  region  = "eu-west-3"
-}
 
 locals {
   mime_types = jsondecode(file("data/mime_types.json"))
@@ -542,88 +530,30 @@ sudo docker run -d --name=grafana -p 3000:3000 grafana/grafana
 }
 
 # Deploy clients
-resource "aws_lightsail_instance" "desktop-client-dub" {
+
+resource "aws_lightsail_instance" "smarttv-throttled-client-eu" {
   provider = aws.eu-west-1
-  name = "desktop-client-dub"
+  name = "smarttv-client-iad"
   blueprint_id      = "ubuntu_20_04"
   bundle_id         = "medium_2_0"
   availability_zone = "eu-west-1a"
   user_data = templatefile("script.tftpl",
                             { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
                               ua = "",
-                              tput = ""})
-}
-resource "aws_lightsail_instance" "mobile-client-dub" {
-  provider = aws.eu-west-1
-  name = "mobile-client-dub"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "eu-west-1a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = var.mobile-user-agent,
-                              tput = var.mobile-tput})
-
-}
-
-resource "aws_lightsail_instance" "smarttv-client-dub" {
-  provider = aws.eu-west-1
-  name = "smarttv-client-dub"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "eu-west-1a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = var.smarttv-user-agent,
-                              tput = ""})
-
-}
-
-resource "aws_lightsail_instance" "throttled-client-cdg" {
-  provider = aws.eu-central-1
-  name = "throttled-client-cdg"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "eu-central-1a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = var.smarttv-user-agent,
-                              tput= 60 })
-
-}
-resource "aws_lightsail_instance" "smarttv-client-iad" {
-  provider = aws.us-east-1
-  name = "smarttv-client-iad"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "us-east-1a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = var.smarttv-user-agent,
-                              tput = ""})
-}
-resource "aws_lightsail_instance" "mobile-client-iad" {
-  provider = aws.us-east-1
-  name = "mobile-client-iad"
-  blueprint_id      = "ubuntu_20_04"
-  bundle_id         = "medium_2_0"
-  availability_zone = "us-east-1a"
-  user_data = templatefile("script.tftpl",
-                            { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
-                              ua = var.mobile-user-agent,
-                              tput = var.mobile-tput})
-
+                              tput = "60",
+                              multi =""})
 }
 resource "aws_lightsail_instance" "desktop-client-iad" {
   provider = aws.us-east-1
   name = "desktop-client-iad"
   blueprint_id      = "ubuntu_20_04"
   bundle_id         = "medium_2_0"
-  availability_zone = "us-east-1a"
+  availability_zone = "us-east-1b"
   user_data = templatefile("script.tftpl",
                             { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
                               ua = "",
-                              tput = ""})
+                              tput = "",
+                              multi = "y"})
 
 }
 
