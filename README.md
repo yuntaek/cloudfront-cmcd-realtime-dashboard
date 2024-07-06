@@ -98,7 +98,7 @@ AWS_VPC_SUBNET_ID=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $7}')
 terraform apply \
   -var="deploy-to-region=${AWS_REGION_CODE}" \
   -var="grafana_ec2_subnet=${AWS_VPC_SUBNET_ID}" \
-  -var="solution_prefix=cmcd"
+  -var="solution_prefix=cmcd" \
   -auto-approve
 ```
 
