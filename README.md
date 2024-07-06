@@ -32,9 +32,11 @@
 ## AWS Cloud9 통합 개발 환경 설정
 
 1. AWS cloud9 생성
-   1. **AWS Cloud9** 콘솔 로 이동합니다.
+   1. **AWS Cloud9** 콘솔로 이동합니다.
    2. **"환경 생성"** 버튼을 클릭합니다.
-   3. 세부 정보 이름에 `cmcd test`(또는 자유 입력)를 입력하고, 나머지 정보는 기본값으로 둔 후 "생성" 버튼을 클릭합니다.
+   3. 세부 정보 이름에 `cmcd test`(또는 자유 입력)를 입력합니다.
+   4. instanceType을 t3.small로 선택합니다.
+   5. 나머지 정보는 기본값으로 둔 후 "생성" 버튼을 클릭합니다.
 2. cloud9 IDE 열기
 3. Cloud9에서 사용하는 Credential에 admin권한 추가<br/>
   AWS Cloud9의 경우, IAM credentials를 동적으로 관리합니다. 해당 credentials는 워크샵을 배포하기 위한 모든 권한을 갖고 있지 않기에 이를 비활성화하고 Admin role 을 포함한 다른 Role 을 사용합니다.

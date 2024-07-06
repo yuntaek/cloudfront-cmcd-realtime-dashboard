@@ -21,6 +21,6 @@ MA="Mozilla/5.0 (iPhone; CPU iPhone OS 10_3 like Mac OS X) AppleWebKit/602.1.50 
 SA="AppleCoreMedia/1.0.0.12B466 (Apple TV; U; CPU OS 8_1_3 like Mac OS X; en_us)"
 (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/hlsjs.py -url ${url} -ua ${ua} -tput ${tput} > /dev/null 2>&1 & disown") | crontab -
 if [ -n "${multi}" ]; then nohup /home/ubuntu/hlsjs.py -url ${url} -ua ${MA} -tput 500 > /dev/null 2>&1 & fi
-if [ -n "${multi}" ]; then (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/hlsjs.py -url ${url} -ua ${MA} -tput 500 > /dev/null 2>&1 & disown") | crontab - fi
-if [ -n "${multi}" ]; then nohup /home/ubuntu/hlsjs.py -url ${url} -ua ${SA} -tput 1500 > /dev/null 2>&1 &  fi
-if [ -n "${multi}" ]; then (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/hlsjs.py -url ${url} -ua ${SA} -tput 1500 > /dev/null 2>&1 & disown") | crontab - fi
+if [ -n "${multi}" ]; then (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/hlsjs.py -url ${url} -ua ${MA} -tput 500 > /dev/null 2>&1 & disown") | crontab -; fi
+if [ -n "${multi}" ]; then nohup /home/ubuntu/hlsjs.py -url ${url} -ua ${SA} -tput 1500 > /dev/null 2>&1 & fi
+if [ -n "${multi}" ]; then (crontab -l 2>/dev/null; echo "@reboot /home/ubuntu/hlsjs.py -url ${url} -ua ${SA} -tput 1500 > /dev/null 2>&1 & disown") | crontab -; fi
