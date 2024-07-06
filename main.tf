@@ -541,7 +541,9 @@ resource "aws_lightsail_instance" "smarttv-throttled-client-eu" {
                             { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
                               ua = "",
                               tput = "60",
-                              multi =""})
+                              multi ="",
+                              MA = var.mobile-user-agent,
+                              SA =  var.smarttv-user-agent})
 }
 resource "aws_lightsail_instance" "desktop-client-iad" {
   provider = aws.us-east-1
@@ -553,7 +555,9 @@ resource "aws_lightsail_instance" "desktop-client-iad" {
                             { url = "https://${aws_cloudfront_distribution.distribution.domain_name}",
                               ua = "",
                               tput = "",
-                              multi = "y"})
+                              multi = "y",
+                              MA = var.mobile-user-agent,
+                              SA =  var.smarttv-user-agent})
 
 }
 
