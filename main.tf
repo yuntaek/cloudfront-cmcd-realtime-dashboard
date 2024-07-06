@@ -46,6 +46,7 @@ resource "aws_s3_bucket_public_access_block" "origin" {
 
 resource "aws_s3_object" "webplayer" {
   bucket       = aws_s3_bucket.origin.id
+  depends_on = [aws_s3_bucket.origin]
   content_type = lookup(local.mime_types, regex("\\.[^.]+$", each.value), null)
   for_each     = fileset("src/", "*")
   key          = each.value
@@ -54,6 +55,7 @@ resource "aws_s3_object" "webplayer" {
 
 resource "aws_s3_object" "buck_bunny" {
   bucket       = aws_s3_bucket.origin.id
+  depends_on = [aws_s3_bucket.origin]
   content_type = lookup(local.mime_types, regex("\\.[^.]+$", each.value), null)
   for_each     = fileset("src/video/hls/buck_bunny/", "*")
   key          = "video/hls/buck_bunny/${each.value}"
