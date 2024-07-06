@@ -81,12 +81,12 @@ cd lambda && zip -r cmcd-log-processor.zip cmcd-log-processor.py && cd ..
 
 3. Terraform 초기화
 
-```bash
+```shell
 terraform init
 ```
 
 4. 설치할 Region 및 SubnetID 획득
-```
+```shell
 subnet_arn=$(aws ec2 describe-subnets --output json | jq -r '.Subnets[0].SubnetArn')
 AWS_REGION_CODE=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $4}')
 AWS_VPC_SUBNET_ID=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $7}')
@@ -96,9 +96,10 @@ AWS_VPC_SUBNET_ID=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $7}')
 
 ```shell
 terraform apply \
-  -var="deploy-to-region=$AWS_REGION_CODE" \
-  -var="grafana_ec2_subnet=$AWS_VPC_SUBNET_ID" \
+  -var="deploy-to-region=${AWS_REGION_CODE}" \
+  -var="grafana_ec2_subnet=${AWS_VPC_SUBNET_ID}" \
   -var="solution_prefix=cmcd"
+  -auto-approve
 ```
 
 - `deploy-to-region`: 솔루션이 배포될 AWS 리전을 지정합니다. 이 리전에서 Amazon Timestream 서비스를 지원해야 합니다. `예) us-east-1`
@@ -161,12 +162,22 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 
 
 ## 프로비저닝 해제
+
+1. 프로비저닝 해제할  Region 및 SubnetID 획득
+``` shell
+subnet_arn=$(aws ec2 describe-subnets --output json | jq -r '.Subnets[0].SubnetArn')
+AWS_REGION_CODE=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $4}')
+AWS_VPC_SUBNET_ID=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $7}')
+```
+
+2. 프로비저닝 해제
 ```shell
 terraform destroy \
-  -var="deploy-to-region=<AWS_REGION_CODE>" \
-  -var="grafana_ec2_subnet=<AWS_VPC_SUBNET_ID>" \
+  -var="deploy-to-region=${AWS_REGION_CODE}" \
+  -var="grafana_ec2_subnet=${AWS_VPC_SUBNET_ID}" \
   -var="solution_prefix=cmcd"
 ```
+
 ## 대시보드 둘러보기
 기본적으로 대시보드는 자동 새로고침되지 않습니다. 필요 없을 때는 Timestream에 대한 쿼리 수를 최소화하여 비용을 절감할 수 있습니다.
 대시보드는 오른쪽 상단 메뉴에서 **Refresh Dashboard**를 클릭하거나 같은 메뉴에서 자동 새로고침을 설정하여 새로고칠 수 있습니다.
