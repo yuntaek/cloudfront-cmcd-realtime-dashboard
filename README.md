@@ -79,40 +79,14 @@ git clone https://github.com/yuntaek/cloudfront-cmcd-realtime-dashboard.git && c
 cd lambda && zip -r cmcd-log-processor.zip cmcd-log-processor.py && cd ..
 ```
 
-3. Terraform 초기화
+3. 솔루션 배포
 
 ```shell
-terraform init
+./deploy.sh
 ```
 
-4. 설치할 Region 및 SubnetID 획득
-```shell
-subnet_arn=$(aws ec2 describe-subnets --output json | jq -r '.Subnets[0].SubnetArn')
-AWS_REGION_CODE=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $4}')
-AWS_VPC_SUBNET_ID=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $7}')
-```
+**참고:** 위의 스크립는 현재 Cloud9이 실행된 region의 subnetId 리스트에서 하나를 선택해서 인프라를 설치합니다. 에러가 발생하면 사용가능한 모든 가용영역의 서브넷으로 변경하여 재시도합니다. us-east-1일 경우 최대 6번 반복 실행 될 수 있습니다.
 
-5. 솔루션 배포:
-
-```shell
-terraform apply \
-  -var="deploy-to-region=${AWS_REGION_CODE}" \
-  -var="grafana_ec2_subnet=${AWS_VPC_SUBNET_ID}" \
-  -var="solution_prefix=cmcd" \
-  -auto-approve
-```
-
-- `deploy-to-region`: 솔루션이 배포될 AWS 리전을 지정합니다. 이 리전에서 Amazon Timestream 서비스를 지원해야 합니다. `예) us-east-1`
-- `grafana_ec2_subnet_id`: Grafana가 설치될 서브넷 Id를 입력하여 지정합니다.  `예) subnet-054cccfcccdb55555`
-- `solution_prefix`: 솔루션에 의해 생성된 리소스 이름에 붙일 고유한 접두사를 제공합니다. `예) CMCD0618`
-
-**참고:** 다음과 같은 오류 메시지가 표시되면:
-```
-Error: InvalidInputException: Sorry, your account can not create an instance using this Lightsail plan size. Please try a smaller plan size or contact Customer Support if you need to use a larger plan.
-```
-이 오류는 `terraform apply` 명령을 다시 실행하면 해결할 수 있습니다.
-이 오류는 일반적으로 Lightsail 인스턴스 플랜 크기가 계정 설정과 호환되지 않을 때 발생합니다.
-명령을 다시 실행하면 Terraform에서 인스턴스 배포를 다시 시도하므로 후속 시도에서 성공할 수 있습니다.
 
 6. Grafana 대시보드 접속 정보 :
 솔루션 배포가 끝나면 아래와 같이 Grafana 접속 정보가 output 정보가 전달됩니다.
@@ -163,14 +137,16 @@ Error: InvalidInputException: Sorry, your account can not create an instance usi
 
 ## 프로비저닝 해제
 
-1. 프로비저닝 해제할  Region 및 SubnetID 획득
+1. 프로비저닝 해제할  Region 획득
 ``` shell
 subnet_arn=$(aws ec2 describe-subnets --output json | jq -r '.Subnets[0].SubnetArn')
 AWS_REGION_CODE=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $4}')
-AWS_VPC_SUBNET_ID=$(echo "$subnet_arn" | awk -F'[:/@]' '{print $7}')
 ```
 
-2. 프로비저닝 해제
+
+
+
+3. 프로비저닝 해제
 ```shell
 terraform destroy \
   -var="deploy-to-region=${AWS_REGION_CODE}" \

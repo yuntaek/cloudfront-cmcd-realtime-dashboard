@@ -519,7 +519,7 @@ resource "aws_iam_instance_profile" "grafana_profile" {
 resource "aws_instance" "garafana-ec2" {
   ami = "ami-08a0d1e16fc3f61ea"
   iam_instance_profile = "${aws_iam_instance_profile.grafana_profile.name}"
-  instance_type = "c5.xlarge"
+  instance_type = "c5.large"
   subnet_id = var.grafana_ec2_subnet
   security_groups = [aws_security_group.grafana.id]
   user_data= <<EOT
