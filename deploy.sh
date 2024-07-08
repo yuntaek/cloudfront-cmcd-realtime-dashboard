@@ -1,10 +1,12 @@
 #!/bin/bash
 subnets=$(aws ec2 describe-subnets --output json)
 AWS_REGION_CODE=$(echo $subnets | jq -r '.Subnets[0].SubnetArn' | awk -F'[:/@]' '{print $4}')
-azs=$(aws ec2 describe-instance-type-offerings --location-type availability-zone --filters "Name=instance-type,Values=c5.xlarge"  --query "InstanceTypeOfferings[?InstanceType=='c5.xlarge'].Location" --output json)
+azs=$(aws ec2 describe-instance-type-offerings --location-type availability-zone --filters "Name=instance-type,Values=c5.large"  --query "InstanceTypeOfferings[?InstanceType=='c5.large'].Location" --output text)
 for az in $azs; do
-    AWS_VPC_SUBNET_ID=$(jq -r ".Subnets[] | select(.AvailabilityZone==\"${az}\") | .SubnetId" <<< $subnets)
-    terraform apply \
+  az=$(echo "$az" | sed 's/,$//')
+  echo "AZ : ${az}"
+  AWS_VPC_SUBNET_ID=$(echo "$subnets" | jq -r ".Subnets[] | select(.AvailabilityZone==\"$az\") | .SubnetId")
+  terraform apply \
   -var="deploy-to-region=${AWS_REGION_CODE}" \
   -var="grafana_ec2_subnet=${AWS_VPC_SUBNET_ID}" \
   -var="solution_prefix=cmcd" \
