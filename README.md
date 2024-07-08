@@ -78,8 +78,11 @@ git clone https://github.com/yuntaek/cloudfront-cmcd-realtime-dashboard.git && c
 ```bash
 cd lambda && zip -r cmcd-log-processor.zip cmcd-log-processor.py && cd ..
 ```
-
-3. 솔루션 배포
+3. Terraform 초기화
+```
+terraform init
+```
+4. 솔루션 배포
 
 ```shell
 ./deploy.sh
