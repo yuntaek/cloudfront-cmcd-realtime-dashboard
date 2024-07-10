@@ -9,7 +9,7 @@
 
 - S3에 호스팅된 HLS 비디오 파일들
 - 오픈 소스 미디어 플레이인 [HLS.js](https://github.com/video-dev/hls.js/) 호스팅하는 웹페이지
-- 다양한 AWS 리전에 배포된 여러 [LightSail](https://aws.amazon.com/lightsail/) 인스턴스로, 모바일, 데스크톱 및 스마트 TV 클라이언트를 모방합니다. 이 인스턴스들은 웹 페이지를 지속적으로 열고 재생을 시작하는 Python 스크립트를 실행합니다. 프랑스 지역의 한 인스턴스는 500Kbps로 대역폭 제한이 적용되어 재버퍼링 이벤트를 시뮬레이션합니다.
+- 다양한 AWS 리전에 배포된 여러 [LightSail](https://aws.amazon.com/lightsail/) 인스턴스로, 모바일, 데스크톱 및 스마트 TV 클라이언트를 모방합니다. 이 인스턴스들은 웹 페이지를 지속적으로 열고 재생을 시작하는 Python 스크립트를 실행합니다. 아일랜드(eu-west-1) 지역의 한 인스턴스는 500Kbps로 대역폭 제한이 적용되어 재버퍼링 이벤트를 시뮬레이션합니다.
 - 클라이언트가 비디오를 시청하는 데 사용되는 실시간 로그가 포함된 CloudFront 배포
 - CloudFront 로그를 전송할 Kinesis Data Stream
 - 로그를 파싱하고 Amazon Timestream에 삽입하는 Lambda 함수
